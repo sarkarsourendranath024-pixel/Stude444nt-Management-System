@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#f5f3ed">
+<title>Classroom — Student Directory</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap');
+:root{--ink:#202b27;--muted:#78817a;--line:#e9e8e1;--paper:#fff;--bg:#f5f4ef;--green:#315c48;--green2:#e9f1e9;--orange:#e87955;--shadow:0 14px 40px #25382c0a}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'DM Sans',sans-serif;font-size:14px}
+button,input,select{font:inherit}
+button{cursor:pointer}
+.shell{min-height:100vh;display:grid;grid-template-columns:248px 1fr}
+.sidebar{background:#fff;border-right:1px solid var(--line);padding:28px 17px;display:flex;flex-direction:column}
+.brand{display:flex;align-items:center;gap:11px;padding:0 12px 36px;font:800 18px Manrope,sans-serif;letter-spacing:-.7px}
+.brand-icon{display:grid;place-items:center;width:34px;height:34px;background:var(--green);color:#fff;border-radius:11px}
+.brand-icon svg{width:19px}
+.school{margin:0 7px 26px;background:#f7f7f3;padding:12px;border:1px solid var(--line);border-radius:12px;display:flex;align-items:center;gap:10px}
+.school-logo{height:35px;width:35px;border-radius:10px;background:#f2dfd5;color:#a4563a;display:grid;place-items:center;font-weight:700}
+.school small,.school strong{display:block}
+.school small{color:var(--muted);font-size:11px;margin-bottom:3px}
+.school strong{font-size:12px}
+.nav-label{padding:0 13px;color:#a0a69f;font-size:10px;letter-spacing:1.5px;font-weight:700;margin:10px 0}
+.nav-item{display:flex;align-items:center;gap:12px;padding:11px 13px;border-radius:9px;color:#727a74;font-size:13px;margin:2px 0}
+.nav-item svg{width:17px;height:17px}
+.nav-item.active{background:var(--green2);color:var(--green);font-weight:700}
+.nav-item .count{margin-left:auto;font-size:11px}
+.side-bottom{margin-top:auto;padding:14px 12px 0;border-top:1px solid var(--line);color:#858c86;font-size:12px;line-height:1.6}
+.side-bottom strong{color:var(--ink)}
+main{padding:32px clamp(24px,5vw,68px) 50px;max-width:1540px;width:100%;margin:0 auto}
+.topline{display:flex;align-items:center;justify-content:space-between;margin-bottom:39px}
+.crumb{font-size:12px;color:#8b928c}
+.crumb b{color:#3e4942;font-weight:600}
+.profile{display:flex;align-items:center;gap:10px}
+.avatar{width:36px;height:36px;border-radius:50%;background:#e8d5c7;color:#754833;display:grid;place-items:center;font-size:12px;font-weight:700}
+.profile span{font-size:12px;font-weight:600}
+.profile small{display:block;color:var(--muted);font-weight:400;margin-top:3px}
+.intro{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;margin-bottom:26px}
+.eyebrow{font-size:11px;text-transform:uppercase;letter-spacing:1.6px;color:#909890;font-weight:700;margin-bottom:9px}
+.intro h1{font:800 clamp(26px,3vw,34px) Manrope,sans-serif;letter-spacing:-1.6px;margin:0 0 7px}
+.intro p{margin:0;color:var(--muted);font-size:13px}
+.actions{display:flex;gap:10px}
+.btn{height:42px;border-radius:9px;padding:0 15px;border:1px solid var(--line);background:#fff;color:#424b45;font-weight:600;font-size:12px;display:inline-flex;gap:8px;align-items:center;justify-content:center;transition:.15s}
+.btn:hover{transform:translateY(-1px);box-shadow:0 4px 12px #0000000c}
+.btn svg{width:15px;height:15px}
+.btn.primary{background:var(--green);color:#fff;border-color:var(--green)}
+.btn.primary:hover{background:#264d3a}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px;margin-bottom:25px}
+.stat{background:var(--paper);border:1px solid var(--line);border-radius:13px;padding:17px 19px;box-shadow:var(--shadow);display:flex;align-items:center;justify-content:space-between}
+.stat-label{font-size:11px;color:var(--muted);font-weight:600;margin-bottom:9px}
+.stat-number{font:800 25px Manrope,sans-serif;letter-spacing:-1px}
+.stat-icon{height:39px;width:39px;border-radius:12px;display:grid;place-items:center;background:#f0f1e9;color:#708351}
+.stat:nth-child(2) .stat-icon{background:#eff2ea;color:#58765e}
+.stat:nth-child(3) .stat-icon{background:#f8eee7;color:#bb7651}
+.stat-icon svg{width:19px}
+.panel{background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);overflow:hidden}
+.panel-head{padding:21px 22px 18px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.panel-title{font:700 15px Manrope,sans-serif;letter-spacing:-.3px}
+.panel-sub{font-size:11px;color:#929991;margin-top:5px}
+.filters{display:flex;gap:9px}
+.search{position:relative}
+.search svg{width:15px;position:absolute;left:11px;top:11px;color:#9ba19c}
+.search input,.filters select{height:36px;border:1px solid var(--line);border-radius:8px;background:#fff;color:#59615b;font-size:11px;outline:none}
+.search input{width:210px;padding:0 10px 0 33px}
+.filters select{padding:0 27px 0 10px}
+.search input:focus,.field input:focus,.field select:focus{border-color:#71917b;box-shadow:0 0 0 3px #315c4812}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;text-align:left}
+thead{background:#fafaf8}
+th{padding:11px 20px;color:#9aa099;font-size:9px;text-transform:uppercase;letter-spacing:1.2px;font-weight:700;white-space:nowrap}
+td{padding:14px 20px;border-top:1px solid #f0f0eb;font-size:12px;color:#57615a;white-space:nowrap}
+tbody tr:hover{background:#fcfcfa}
+.student{display:flex;align-items:center;gap:10px}
+.student-avatar{height:33px;width:33px;border-radius:10px;background:#eef2e7;color:#557047;display:grid;place-items:center;font-size:11px;font-weight:700}
+.student-name{font-weight:700;color:#29342e}
+.student-email{font-size:10px;color:#9aa099;margin-top:3px}
+.roll{font-weight:700;color:#59685d}
+.stream{display:inline-flex;padding:5px 9px;border-radius:20px;background:#f2f3ec;color:#61704f;font-size:10px;font-weight:600}
+.phone{color:#737d76}
+.row-actions{display:flex;gap:5px}
+.icon-btn{border:0;background:transparent;color:#929991;width:29px;height:29px;border-radius:7px;display:grid;place-items:center}
+.icon-btn:hover{background:#f1f3ed;color:var(--green)}
+.icon-btn svg{width:15px}
+.empty{text-align:center;padding:48px 15px;color:#8b948d}
+.empty strong{display:block;color:#38453d;margin-bottom:6px;font-size:13px}
+.empty .btn{margin-top:14px}
+.panel-foot{padding:13px 21px;border-top:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;color:#959c96;font-size:10px}
+.modal-backdrop{position:fixed;inset:0;background:#18241dcc;display:none;align-items:center;justify-content:center;padding:20px;z-index:5}
+.modal-backdrop.open{display:flex}
+.modal{width:min(100%,485px);background:#fff;border-radius:16px;box-shadow:0 25px 80px #0003;overflow:hidden;animation:rise .18s ease-out}
+@keyframes rise{from{opacity:.5;transform:translateY(8px)}to{opacity:1;transform:none}}
+.modal-head{padding:21px 24px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+.modal-head h2{font:700 17px Manrope;margin:0;letter-spacing:-.5px}
+.modal-head p{margin:5px 0 0;color:var(--muted);font-size:11px}
+.close{border:0;background:#f5f5f1;width:30px;height:30px;border-radius:8px;color:#69736b;font-size:19px}
+.form{padding:21px 24px 24px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+.field.full{grid-column:1 / -1}
+.field label{display:block;font-size:11px;font-weight:700;color:#4f5b53;margin-bottom:7px}
+.field input,.field select{height:40px;width:100%;border:1px solid var(--line);border-radius:8px;padding:0 11px;font-size:12px;outline:none;background:#fff;color:#334038}
+.field input::placeholder{color:#b1b6b1}
+.modal-actions{display:flex;justify-content:flex-end;gap:9px;margin-top:23px}
+.toast{position:fixed;bottom:24px;left:50%;transform:translate(-50%,20px);opacity:0;background:#243a2e;color:#fff;border-radius:9px;padding:12px 17px;font-size:12px;box-shadow:0 8px 30px #0002;transition:.22s;pointer-events:none;z-index:10}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+@media(max-width:850px){.shell{grid-template-columns:68px 1fr}.sidebar{padding:24px 10px}.brand{justify-content:center;padding:0 0 35px}.brand-name,.school,.nav-label,.nav-item span,.side-bottom{display:none}.nav-item{justify-content:center;padding:12px}.nav-item svg{width:19px;height:19px}.stats{gap:10px}.stat{padding:14px}.panel-head{align-items:flex-start;flex-direction:column}.filters{width:100%}.search{flex:1}.search input{width:100%}.intro{align-items:flex-start;flex-direction:column}}
+@media(max-width:560px){.shell{grid-template-columns:1fr}.sidebar{display:none}main{padding:22px 15px 35px}.topline{margin-bottom:28px}.profile span{display:none}.stats{grid-template-columns:1fr}.stat{padding:13px 16px}.stat-number{font-size:22px}.actions{width:100%}.actions .btn{flex:1;padding:0 8px;font-size:11px}.panel-head{padding:17px}.filters{flex-direction:column}.filters select{height:36px}.form-grid{grid-template-columns:1fr}.field.full{grid-column:auto}.modal-head,.form{padding-left:18px;padding-right:18px}th,td{padding-left:13px;padding-right:13px}}
+</style>
+</head>
+<body>
+<div class="shell">
+<aside class="sidebar">
+<div class="brand"><div class="brand-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z"/><path d="M8 7h8M8 11h6"/></svg></div><span class="brand-name">classroom</span></div>
+<div class="school"><div class="school-logo">A</div><div><small>Workspace</small><strong>Academy Portal</strong></div></div>
+<div class="nav-label">MENU</div>
+<div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg><span>Overview</span></div>
+<div class="nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="10" cy="7" r="4"/><path d="M20 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>Students</span><span class="count" id="navCount">0</span></div>
+<div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z"/></svg><span>Courses</span></div>
+<div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><span>Attendance</span></div>
+<div class="nav-label" style="margin-top:30px">PREFERENCES</div>
+<div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="m19.4 15 .1.1a1.7 1.7 0 0 1-2.4 2.4l-.1-.1a1.7 1.7 0 0 0-2.9 1.2v.2a1.7 1.7 0 0 1-3.4 0v-.2a1.7 1.7 0 0 0-2.9-1.2l-.1.1a1.7 1.7 0 0 1-2.4-2.4l.1-.1a1.7 1.7 0 0 0-1.2-2.9H4a1.7 1.7 0 0 1 0-3.4h.2A1.7 1.7 0 0 0 5.4 5.8l-.1-.1a1.7 1.7 0 0 1 2.4-2.4l.1.1a1.7 1.7 0 0 0 2.9-1.2V2a1.7 1.7 0 0 1 3.4 0v.2A1.7 1.7 0 0 0 17 3.4l.1-.1a1.7 1.7 0 0 1 2.4 2.4l-.1.1a1.7 1.7 0 0 0 1.2 2.9h.2a1.7 1.7 0 0 1 0 3.4h-.2a1.7 1.7 0 0 0-1.2 2.9Z"/></svg><span>Settings</span></div>
+<div class="side-bottom">Made for a better<br><strong>school day.</strong></div>
+</aside>
+<main>
+<div class="topline"><div class="crumb">Academy Portal <span style="margin:0 8px;color:#c4c8c3">/</span> <b>Students</b></div><div class="profile"><div class="avatar">AD</div><span>Administrator<small>School admin</small></span></div></div>
+<section class="intro"><div><div class="eyebrow">People &amp; records</div><h1>Student directory</h1><p>Keep your student records organized, all in one place.</p></div><div class="actions"><button class="btn" id="exportBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>Export CSV</button><button class="btn primary" id="addBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>Add student</button></div></section>
+<section class="stats">
+<div class="stat"><div><div class="stat-label">Total students</div><div class="stat-number" id="totalStat">0</div></div><div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="10" cy="7" r="4"/><path d="M20 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div></div>
+<div class="stat"><div><div class="stat-label">Streams represented</div><div class="stat-number" id="streamStat">0</div></div><div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3 2 8l10 5 10-5-10-5Z"/><path d="m2 12 10 5 10-5M2 16l10 5 10-5"/></svg></div></div>
+<div class="stat"><div><div class="stat-label">Registration numbers</div><div class="stat-number" id="regStat">0</div></div><div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 8h.01M11 8h6M7 12h.01M11 12h6M7 16h.01M11 16h3"/></svg></div></div>
+</section>
+<section class="panel">
+<div class="panel-head"><div><div class="panel-title">All students</div><div class="panel-sub" id="resultLabel">A clear view of every student in your school</div></div><div class="filters"><div class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><input id="searchInput" placeholder="Search students..." aria-label="Search students"></div><select id="streamFilter" aria-label="Filter by stream"><option value="">All streams</option></select></div></div>
+<div class="table-wrap"><table><thead><tr><th>Student</th><th>Roll no.</th><th>Registration no.</th><th>Phone number</th><th>Stream</th><th></th></tr></thead><tbody id="studentRows"></tbody></table><div class="empty" id="emptyState"><strong>No students yet</strong>Add your first student to get your directory started.<br><button class="btn primary" id="emptyAdd">+ Add your first student</button></div></div><div class="panel-foot"><span id="footCount">Showing 0 students</span><span>Saved on this device</span></div>
+</section>
+</main></div>
+<div class="modal-backdrop" id="modal"><section class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><div class="modal-head"><div><h2 id="modalTitle">Add a student</h2><p>Enter the student's details below.</p></div><button class="close" id="closeModal" aria-label="Close">×</button></div>
+<form class="form" id="studentForm"><div class="form-grid">
+<div class="field full"><label for="name">Student name *</label><input id="name" name="name" placeholder="e.g. Ananya Sharma" required maxlength="80"></div>
+<div class="field"><label for="roll">Roll number *</label><input id="roll" name="roll" placeholder="e.g. 024" required maxlength="30"></div>
+<div class="field"><label for="reg">Registration number *</label><input id="reg" name="reg" placeholder="e.g. REG-2025-1042" required maxlength="40"></div>
+<div class="field full"><label for="phone">Phone number *</label><input id="phone" name="phone" type="tel" placeholder="e.g. +91 98765 43210" required maxlength="25"></div>
+<div class="field full"><label for="stream">Stream *</label><select id="stream" name="stream" required><option value="" disabled selected>Select a stream</option><option>Science</option><option>Commerce</option><option>Arts</option><option>Humanities</option><option>Vocational</option><option>Other</option></select></div>
+</div><div class="modal-actions"><button class="btn" type="button" id="cancelBtn">Cancel</button><button class="btn primary" type="submit" id="saveBtn">Save student</button></div></form>
+</section></div>
+<div class="toast" id="toast"></div>
+<script>
+const KEY='classroom-students-v1';
+let students=[];
+let editId=null;
+try {
+  students=JSON.parse(localStorage.getItem(KEY)||'[]');
+  if(!Array.isArray(students)) students=[];
+} catch {
+  students=[];
+}
+
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const initials=n=>n.trim().split(/\s+/).slice(0,2).map(x=>x[0]).join('').toUpperCase();
+const icon=kind=>kind==='edit'
+  ?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L8 18l-4 1 1-4Z"/></svg>'
+  :'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 6h18M8 6V4h8v2m3 0-1 14H6L5 6m4 4v6m6-6v6"/></svg>';
+
+function persist(){
+  localStorage.setItem(KEY,JSON.stringify(students));
+}
+
+function render(){
+  const q=$('#searchInput').value.trim().toLowerCase();
+  const f=$('#streamFilter').value;
+  const shown=students.filter(s=>
+    (!f||s.stream===f)&&
+    (!q||[s.name,s.roll,s.reg,s.phone,s.stream].some(v=>v.toLowerCase().includes(q)))
+  );
+
+  $('#studentRows').innerHTML=shown.map(s=>`
+    <tr>
+      <td><div class="student">
+        <div class="student-avatar">${esc(initials(s.name))}</div>
+        <div><div class="student-name">${esc(s.name)}</div><div class="student-email">Student record</div></div>
+      </div></td>
+      <td><span class="roll">${esc(s.roll)}</span></td>
+      <td>${esc(s.reg)}</td>
+      <td class="phone">${esc(s.phone)}</td>
+      <td><span class="stream">${esc(s.stream)}</span></td>
+      <td><div class="row-actions">
+        <button class="icon-btn" title="Edit ${esc(s.name)}" aria-label="Edit ${esc(s.name)}" data-action="edit" data-id="${esc(s.id)}">${icon('edit')}</button>
+        <button class="icon-btn" title="Delete ${esc(s.name)}" aria-label="Delete ${esc(s.name)}" data-action="delete" data-id="${esc(s.id)}">${icon('delete')}</button>
+      </div></td>
+    </tr>`).join('');
+
+  $('#emptyState').style.display=shown.length?'none':'block';
+  $('#resultLabel').textContent=q||f
+    ?`Showing ${shown.length} of ${students.length} student${students.length===1?'':'s'}`
+    :'A clear view of every student in your school';
+  $('#footCount').textContent=`Showing ${shown.length} student${shown.length===1?'':'s'}`;
+  $('#totalStat').textContent=students.length;
+  $('#streamStat').textContent=new Set(students.map(s=>s.stream)).size;
+  $('#regStat').textContent=students.filter(s=>s.reg.trim()).length;
+  $('#navCount').textContent=students.length;
+
+  const opts=[...new Set(students.map(s=>s.stream))].sort();
+  const old=$('#streamFilter').value;
+  $('#streamFilter').innerHTML='<option value="">All streams</option>'+
+    opts.map(o=>`<option value="${esc(o)}">${esc(o)}</option>`).join('');
+  $('#streamFilter').value=opts.includes(old)?old:'';
+}
+
+function openModal(s){
+  editId=s?.id||null;
+  $('#studentForm').reset();
+  $('#modalTitle').textContent=s?'Edit student':'Add a student';
+  $('#saveBtn').textContent=s?'Save changes':'Save student';
+
+  if(s){
+    $('#name').value=s.name;
+    $('#roll').value=s.roll;
+    $('#reg').value=s.reg;
+    $('#phone').value=s.phone;
+    $('#stream').value=s.stream;
+  }
+  $('#modal').classList.add('open');
+  setTimeout(()=>$('#name').focus(),20);
+}
+
+function closeModal(){
+  $('#modal').classList.remove('open');
+  editId=null;
+}
+
+let toastTimer;
+function toast(msg){
+  const t=$('#toast');
+  t.textContent=msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),2400);
+}
+
+$('#addBtn').onclick=()=>openModal();
+$('#emptyAdd').onclick=()=>openModal();
+$('#closeModal').onclick=closeModal;
+$('#cancelBtn').onclick=closeModal;
+$('#modal').onclick=e=>{if(e.target===$('#modal'))closeModal()};
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
+$('#searchInput').oninput=render;
+$('#streamFilter').onchange=render;
+
+$('#studentForm').onsubmit=e=>{
+  e.preventDefault();
+  const fd=new FormData(e.currentTarget);
+  const record={
+    name:fd.get('name').trim(),
+    roll:fd.get('roll').trim(),
+    reg:fd.get('reg').trim(),
+    phone:fd.get('phone').trim(),
+    stream:fd.get('stream')
+  };
+  if(!Object.values(record).every(Boolean))return;
+
+  const duplicate=students.find(s=>
+    s.id!==editId&&
+    (s.roll.toLowerCase()===record.roll.toLowerCase()||
+     s.reg.toLowerCase()===record.reg.toLowerCase())
+  );
+  if(duplicate){
+    toast(duplicate.roll.toLowerCase()===record.roll.toLowerCase()
+      ?'That roll number is already in use.'
+      :'That registration number is already in use.');
+    return;
+  }
+
+  if(editId){
+    students=students.map(s=>s.id===editId?{...s,...record}:s);
+    toast('Student details updated.');
+  }else{
+    students.unshift({
+      id:crypto.randomUUID?crypto.randomUUID():String(Date.now()),
+      ...record
+    });
+    toast('Student added to your directory.');
+  }
+
+  persist();
+  closeModal();
+  render();
+};
+
+$('#studentRows').onclick=e=>{
+  const b=e.target.closest('button[data-action]');
+  if(!b)return;
+  const s=students.find(x=>x.id===b.dataset.id);
+  if(!s)return;
+
+  if(b.dataset.action==='edit'){
+    openModal(s);
+  }else if(confirm(`Remove ${s.name} from the directory?`)){
+    students=students.filter(x=>x.id!==s.id);
+    persist();
+    render();
+    toast('Student removed.');
+  }
+};
+
+$('#exportBtn').onclick=()=>{
+  if(!students.length){
+    toast('Add a student before exporting.');
+    return;
+  }
+
+  const headers=['Name','Roll Number','Phone Number','Stream','Registration Number'];
+  const csv=[headers,...students.map(s=>[s.name,s.roll,s.phone,s.stream,s.reg])]
+    .map(row=>row.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(','))
+    .join('\r\n');
+
+  const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='student-directory.csv';
+  a.click();
+  URL.revokeObjectURL(a.href);
+  toast('Student list exported.');
+};
+
+render();
+</script>
+</body>
+</html>
